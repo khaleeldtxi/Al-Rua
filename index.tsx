@@ -331,6 +331,8 @@ const LocationModal = ({
   currentMethod,
   currentFiqh,
   currentAdjustment,
+  currentCity,
+  currentCountry,
 }: {
   isOpen: boolean;
   onClose: () => void;
@@ -339,9 +341,11 @@ const LocationModal = ({
   currentMethod: number;
   currentFiqh: number;
   currentAdjustment: number;
+  currentCity: string;
+  currentCountry: string;
 }) => {
-  const [city, setCity] = useState("");
-  const [country, setCountry] = useState("");
+  const [city, setCity] = useState(currentCity);
+  const [country, setCountry] = useState(currentCountry);
   const [method, setMethod] = useState(currentMethod);
   const [fiqh, setFiqh] = useState(currentFiqh);
   const [adjustment, setAdjustment] = useState(currentAdjustment);
@@ -351,8 +355,10 @@ const LocationModal = ({
         setMethod(currentMethod);
         setFiqh(currentFiqh);
         setAdjustment(currentAdjustment);
+        setCity(currentCity);
+        setCountry(currentCountry);
     }
-  }, [isOpen, currentMethod, currentFiqh, currentAdjustment]);
+  }, [isOpen, currentMethod, currentFiqh, currentAdjustment, currentCity, currentCountry]);
 
   if (!isOpen) return null;
 
@@ -490,12 +496,18 @@ const App = () => {
 
   // Initialize state from LocalStorage if available
   const [locationMode, setLocationMode] = useState<'gps' | 'city'>(() => {
-    return (localStorage.getItem('locationMode') as 'gps' | 'city') || 'gps';
+    const saved = localStorage.getItem('locationMode');
+    // Default to 'gps' if not explicitly set to 'city'
+    return saved === 'city' ? 'city' : 'gps';
   });
   
   const [savedCity, setSavedCity] = useState<{city: string, country: string} | null>(() => {
     const saved = localStorage.getItem('savedCity');
-    return saved ? JSON.parse(saved) : null;
+    try {
+        return saved ? JSON.parse(saved) : null;
+    } catch {
+        return null;
+    }
   });
 
   const [calculationMethod, setCalculationMethod] = useState(() => {
@@ -669,6 +681,7 @@ const App = () => {
 
   // Initial Fetch based on saved preference
   useEffect(() => {
+    // Explicitly check for saved city preference to prioritize it
     if (locationMode === 'city' && savedCity) {
       fetchByCity(savedCity.city, savedCity.country, calculationMethod, fiqh, hijriAdjustment);
     } else {
@@ -773,9 +786,9 @@ const App = () => {
                   alt="Golden Arch"
                />
                
-               {/* Dark Mode Image (Direct Google Drive Link replaced with reliable Unsplash equivalent) */}
+               {/* Dark Mode Image */}
                <img 
-                  src="https://images.unsplash.com/photo-1519817650390-64a93db51149?q=80&w=2574&auto=format&fit=crop" 
+                  src="https://lh3.googleusercontent.com/pw/AP1GczOfzCLDs1-uc-D22_ecMmX4eyyC1F4XicMqQ5gfQ8fk9ulnHFGI_k_iyHS8KcdpPPclVJ_ghH5F6mlAqM01h3s9JJ5r3CTWUSvw7UhtqfkGJYnGAcp0JSVsnHtEe5s_dgZLw5zv1Vyy40W67qqA2RTG=w1312-h736-s-no" 
                   className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-700 ${theme === 'dark' ? 'opacity-100' : 'opacity-0'}`}
                   alt="Dark Arch"
                />
@@ -935,6 +948,8 @@ const App = () => {
         currentMethod={calculationMethod}
         currentFiqh={fiqh}
         currentAdjustment={hijriAdjustment}
+        currentCity={savedCity?.city || ""}
+        currentCountry={savedCity?.country || ""}
       />
     </div>
   );
