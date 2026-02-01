@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
 import { createRoot } from "react-dom/client";
 import { GoogleGenAI } from "@google/genai";
 
@@ -58,6 +58,31 @@ const DAILY_VERSES = [
     arabic: "وَاللَّهُ يَرْزُقُ مَن يَشَاءُ بِغَيْرِ حِسَابٍ",
     translation: "And Allah gives provision to whom He wills without account.",
     ref: "Surah Al-Baqarah 2:212"
+  },
+  {
+    arabic: "لَا يُكَلِّفُ اللَّهُ نَفْسًا إِلَّا وُسْعَهَا",
+    translation: "Allah does not burden a soul beyond that it can bear.",
+    ref: "Surah Al-Baqarah 2:286"
+  },
+  {
+    arabic: "وَهُوَ مَعَكُمْ أَيْنَ مَا كُنتُمْ",
+    translation: "And He is with you wherever you are.",
+    ref: "Surah Al-Hadid 57:4"
+  },
+  {
+    arabic: "ادْعُونِي أَسْتَجِبْ لَكُمْ",
+    translation: "Call upon Me; I will respond to you.",
+    ref: "Surah Ghafir 40:60"
+  },
+  {
+    arabic: "أَلَا بِذِكْرِ اللَّهِ تَطْمَئِنُّ الْقُلُوبُ",
+    translation: "Unquestionably, by the remembrance of Allah do hearts find rest.",
+    ref: "Surah Ar-Ra'd 13:28"
+  },
+  {
+    arabic: "وَاصْبِرْ وَمَا صَبْرُكَ إِلَّا بِاللَّهِ",
+    translation: "And be patient, and your patience is not but through Allah.",
+    ref: "Surah An-Nahl 16:127"
   }
 ];
 
@@ -99,6 +124,9 @@ const Icons = {
   Settings: () => <i className="fa-solid fa-gear"></i>,
   Minus: () => <i className="fa-solid fa-minus"></i>,
   Plus: () => <i className="fa-solid fa-plus"></i>,
+  Copy: () => <i className="fa-solid fa-copy"></i>,
+  Check: () => <i className="fa-solid fa-check"></i>,
+  Globe: () => <i className="fa-solid fa-earth-americas"></i>,
 };
 
 // --- Helper Functions ---
@@ -147,6 +175,29 @@ const getDailyVerse = () => {
 
 // --- Components ---
 
+// Particle Effect Component
+const FloatingParticles = () => {
+  // Use useMemo to generate stable particle properties
+  const particles = useMemo(() => {
+    return Array.from({ length: 15 }).map((_, i) => ({
+      left: `${Math.random() * 100}%`,
+      bottom: `-${Math.random() * 20}%`,
+      animationDelay: `${Math.random() * 10}s`,
+      animationDuration: `${10 + Math.random() * 15}s`,
+      width: `${2 + Math.random() * 4}px`,
+      height: `${2 + Math.random() * 4}px`,
+    }));
+  }, []);
+
+  return (
+    <div className="absolute inset-0 pointer-events-none z-10 overflow-hidden">
+      {particles.map((style, i) => (
+        <div key={i} className="particle" style={style} />
+      ))}
+    </div>
+  );
+};
+
 const PrayerCard = ({
   name,
   time,
@@ -164,33 +215,41 @@ const PrayerCard = ({
     style={{ animationDelay: `${index * 100}ms` }}
     className={`relative overflow-hidden flex flex-col items-center justify-center p-6 rounded-3xl transition-all duration-500 ease-out cursor-default border ${
       isNext
-        ? "bg-qolb-dark text-white shadow-xl shadow-qolb-primary/30 scale-[1.02] border-qolb-dark animate-pulse-slow ring-4 ring-qolb-primary/10"
+        ? "text-white shadow-xl shadow-qolb-primary/30 scale-[1.02] border-transparent ring-4 ring-qolb-primary/10"
         : "bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-white/90 dark:hover:bg-slate-700 hover:shadow-lg border-slate-100 dark:border-slate-700 animate-slide-in-right"
     }`}
   >
     {isNext && (
-      <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-qolb-accent to-transparent"></div>
+      <>
+        {/* Animated Background for Next Prayer */}
+        <div 
+          className="absolute inset-0 bg-gradient-to-br from-qolb-dark via-[#31572C] to-qolb-dark animate-gradient-mesh z-0"
+        ></div>
+        {/* Shine overlay */}
+        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-qolb-accent to-transparent z-10"></div>
+      </>
     )}
+    
     <div
-      className={`w-12 h-12 rounded-full flex items-center justify-center text-xl mb-3 transition-colors duration-300 ${
+      className={`relative z-10 w-12 h-12 rounded-full flex items-center justify-center text-xl mb-3 transition-colors duration-300 ${
         isNext 
-        ? "bg-white/10 text-qolb-accent" 
+        ? "bg-white/10 text-qolb-accent backdrop-blur-sm" 
         : "bg-qolb-bg dark:bg-slate-700 text-slate-400 group-hover:text-qolb-dark dark:group-hover:text-qolb-light"
       }`}
     >
       {icon}
     </div>
     
-    <span className={`block font-serif text-lg mb-1 ${isNext ? "font-bold text-white" : "font-medium text-slate-800 dark:text-white"}`}>
+    <span className={`relative z-10 block font-serif text-lg mb-1 ${isNext ? "font-bold text-white" : "font-medium text-slate-800 dark:text-white"}`}>
       {name}
     </span>
     
-    <span className={`font-mono text-2xl font-bold tracking-tight ${isNext ? "text-qolb-accent" : "text-slate-600 dark:text-slate-400"}`}>
+    <span className={`relative z-10 font-mono text-2xl font-bold tracking-tight ${isNext ? "text-qolb-accent" : "text-slate-600 dark:text-slate-400"}`}>
       {formatTime(time)}
     </span>
     
     {isNext && (
-      <span className="mt-2 text-[10px] bg-qolb-accent/20 text-qolb-accent px-2 py-0.5 rounded-full uppercase tracking-widest font-bold animate-pulse">
+      <span className="relative z-10 mt-2 text-[10px] bg-white/20 text-white px-2 py-0.5 rounded-full uppercase tracking-widest font-bold backdrop-blur-sm">
         Upcoming
       </span>
     )}
@@ -493,6 +552,7 @@ const App = () => {
   const [error, setError] = useState<string | null>(null);
   const [showLocationModal, setShowLocationModal] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
+  const [copied, setCopied] = useState(false);
 
   // Initialize state from LocalStorage if available
   const [locationMode, setLocationMode] = useState<'gps' | 'city'>(() => {
@@ -679,6 +739,12 @@ const App = () => {
     }
   };
 
+  const copyVerse = () => {
+      navigator.clipboard.writeText(`"${dailyVerse.translation}" - ${dailyVerse.ref}`);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+  };
+
   // Initial Fetch based on saved preference
   useEffect(() => {
     // Explicitly check for saved city preference to prioritize it
@@ -775,21 +841,21 @@ const App = () => {
       <main className="max-w-7xl mx-auto px-6 py-8 space-y-12">
         
         {/* --- Hero Section --- */}
-        <div className="relative rounded-[3rem] overflow-hidden min-h-[550px] flex flex-col p-8 md:p-12 shadow-2xl shadow-qolb-dark/20 group animate-fade-in-up" style={{ animationDelay: '200ms' }}>
+        <div className="relative rounded-[3rem] overflow-hidden min-h-[550px] shadow-2xl shadow-qolb-dark/20 group animate-fade-in-up" style={{ animationDelay: '200ms' }}>
             
-            {/* Background Images */}
-            <div className="absolute inset-0 z-0 bg-white dark:bg-black transition-colors duration-500">
+            {/* Background Images with Ken Burns Effect */}
+            <div className="absolute inset-0 z-0 bg-white dark:bg-black transition-colors duration-500 overflow-hidden">
                {/* Light Mode Image */}
                <img 
                   src="https://images.unsplash.com/photo-1542468087-175591c2780e?q=80&w=2670&auto=format&fit=crop" 
-                  className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-700 ${theme === 'light' ? 'opacity-100' : 'opacity-0'}`}
+                  className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-700 animate-ken-burns ${theme === 'light' ? 'opacity-100' : 'opacity-0'}`}
                   alt="Golden Arch"
                />
                
                {/* Dark Mode Image */}
                <img 
                   src="https://lh3.googleusercontent.com/pw/AP1GczOfzCLDs1-uc-D22_ecMmX4eyyC1F4XicMqQ5gfQ8fk9ulnHFGI_k_iyHS8KcdpPPclVJ_ghH5F6mlAqM01h3s9JJ5r3CTWUSvw7UhtqfkGJYnGAcp0JSVsnHtEe5s_dgZLw5zv1Vyy40W67qqA2RTG=w1312-h736-s-no" 
-                  className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-700 ${theme === 'dark' ? 'opacity-100' : 'opacity-0'}`}
+                  className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-700 animate-ken-burns ${theme === 'dark' ? 'opacity-100' : 'opacity-0'}`}
                   alt="Dark Arch"
                />
                
@@ -798,8 +864,11 @@ const App = () => {
                <div className="absolute inset-0 bg-gradient-to-b from-transparent via-white/60 to-transparent dark:via-slate-900/60 opacity-50 transition-colors duration-500"></div>
             </div>
 
-            {/* Content Container */}
-            <div className="relative z-10 flex flex-col h-full justify-between">
+            {/* Floating Particles */}
+            <FloatingParticles />
+
+            {/* Content Container (Top & Middle) - Added padding-bottom to make room for footer */}
+            <div className="relative z-10 flex flex-col h-full justify-between p-8 md:p-12 pb-32">
                 
                 {/* Top Row: Date & Current Time Label */}
                 <div className="flex justify-between items-start text-qolb-dark dark:text-white">
@@ -824,47 +893,68 @@ const App = () => {
 
                     {/* Right: Clock & Next Prayer */}
                     <div className="text-center md:text-right">
-                         <div className="text-6xl md:text-8xl font-mono font-light text-qolb-dark dark:text-white tracking-wide mb-2 drop-shadow-sm">
-                            {currentTime.toLocaleTimeString('en-US', { timeZone: timezone, hour: '2-digit', minute:'2-digit', hour12: true }).replace(/ AM| PM/, '')}
-                            <span className="text-2xl md:text-3xl ml-2 font-sans font-bold text-qolb-primary dark:text-qolb-light">
-                                {currentTime.toLocaleTimeString('en-US', { timeZone: timezone, hour12: true }).slice(-2)}
-                            </span>
-                         </div>
-                         <div className="inline-block bg-qolb-dark/5 dark:bg-white/10 backdrop-blur-sm px-6 py-2 rounded-full border border-qolb-dark/10 dark:border-white/10">
-                             <span className="text-qolb-primary dark:text-qolb-light text-xs font-bold uppercase tracking-widest mr-3">Upcoming: {nextPrayer || "--"}</span>
-                             <span className="text-qolb-dark dark:text-white text-xl font-mono font-bold">
-                                {prayerTimes && nextPrayer ? formatTime(prayerTimes[nextPrayer as keyof PrayerTimes]) : "--:--"}
-                             </span>
+                         <div className="flex flex-col items-center md:items-end">
+                            <div className="text-6xl md:text-8xl font-mono font-light text-qolb-dark dark:text-white tracking-wide mb-2 drop-shadow-sm leading-none">
+                                {currentTime.toLocaleTimeString('en-US', { timeZone: timezone, hour: '2-digit', minute:'2-digit', hour12: true }).replace(/ AM| PM/, '')}
+                                <span className="text-2xl md:text-3xl ml-2 font-sans font-bold text-qolb-primary dark:text-qolb-light">
+                                    {currentTime.toLocaleTimeString('en-US', { timeZone: timezone, hour12: true }).slice(-2)}
+                                </span>
+                            </div>
+                            
+                            {/* Timezone Display */}
+                            <div className="flex items-center gap-2 mb-4 text-sm font-medium text-qolb-dark/70 dark:text-white/70 bg-white/30 dark:bg-black/30 px-3 py-1 rounded-full backdrop-blur-md">
+                                <Icons.Globe />
+                                <span>{timezone}</span>
+                            </div>
+
+                             <div className="inline-block bg-qolb-dark/5 dark:bg-white/10 backdrop-blur-sm px-6 py-2 rounded-full border border-qolb-dark/10 dark:border-white/10">
+                                 <span className="text-qolb-primary dark:text-qolb-light text-xs font-bold uppercase tracking-widest mr-3">Upcoming: {nextPrayer || "--"}</span>
+                                 <span className="text-qolb-dark dark:text-white text-xl font-mono font-bold">
+                                    {prayerTimes && nextPrayer ? formatTime(prayerTimes[nextPrayer as keyof PrayerTimes]) : "--:--"}
+                                 </span>
+                             </div>
                          </div>
                     </div>
                 </div>
-
-                {/* Bottom Row: Daily Quranic Wisdom */}
-                <div className="flex flex-col md:flex-row items-center md:items-end gap-6 border-t border-qolb-dark/10 dark:border-white/10 pt-8 mt-auto">
-                     {/* Left: Label */}
-                     <div className="hidden md:flex flex-col items-center justify-center w-32 border-r border-qolb-dark/10 dark:border-white/10 pr-6 h-full">
-                         <div className="text-qolb-primary dark:text-qolb-light text-2xl mb-2"><Icons.Book /></div>
-                         <div className="text-qolb-dark dark:text-white text-[10px] font-bold uppercase tracking-[0.2em] text-center leading-relaxed">Daily<br/>Wisdom</div>
-                     </div>
-                     
-                     {/* Center: Verse */}
-                     <div className="flex-1 text-center animate-fade-in">
-                         {/* Arabic Verse - Centered & Large */}
-                         <p className="text-4xl md:text-6xl font-arabic text-qolb-dark dark:text-white leading-relaxed mb-6 drop-shadow-sm" dir="rtl">
-                             {dailyVerse.arabic}
-                         </p>
-                         <p className="text-qolb-dark/80 dark:text-white/80 italic font-serif text-xl md:text-2xl leading-relaxed mb-2">
-                             "{dailyVerse.translation}"
-                         </p>
-                         <p className="text-sm text-qolb-primary dark:text-qolb-light font-bold uppercase tracking-widest">— {dailyVerse.ref}</p>
-                     </div>
-
-                     {/* Right: Decorative (optional) */}
-                     <div className="hidden md:block w-32 opacity-20 text-qolb-dark dark:text-white text-right text-xs font-bold leading-loose">
-                        YOU ARE<br/>NOT ALONE<br/><br/>DON'T<br/>GIVE UP
-                     </div>
-                </div>
             </div>
+
+            {/* Bottom Row: Dynamic Daily Quranic Wisdom (Now as an absolute footer) */}
+            <div className="absolute bottom-0 left-0 right-0 bg-white/20 dark:bg-black/20 backdrop-blur-md border-t border-white/30 dark:border-white/10 p-6 md:px-12 md:py-8 transition-all hover:bg-white/30 dark:hover:bg-black/30 z-20">
+                    <div className="absolute top-0 right-0 p-4 opacity-10 text-4xl text-qolb-dark dark:text-white"><Icons.Book /></div>
+                    
+                    <div className="flex flex-col md:flex-row gap-6 items-center">
+                        <div className="flex-shrink-0 flex flex-col items-center justify-center text-center">
+                            <span className="text-qolb-primary dark:text-qolb-light text-xs font-bold uppercase tracking-[0.3em] mb-1">Daily</span>
+                            <span className="text-qolb-dark dark:text-white font-serif text-xl font-bold">Wisdom</span>
+                        </div>
+                        
+                        <div className="w-px h-12 bg-current opacity-20 hidden md:block"></div>
+
+                        <div className="flex-1 text-center md:text-left">
+                            <p className="text-2xl md:text-3xl font-arabic text-qolb-dark dark:text-white leading-relaxed mb-2" dir="rtl">
+                                {dailyVerse.arabic}
+                            </p>
+                            <p className="text-qolb-dark/90 dark:text-white/90 italic font-serif text-lg leading-relaxed">
+                                "{dailyVerse.translation}"
+                            </p>
+                        </div>
+
+                        <div className="flex-shrink-0 flex flex-col items-end gap-2">
+                        <span className="text-xs text-qolb-primary dark:text-qolb-light font-bold uppercase tracking-widest bg-qolb-dark/5 dark:bg-white/5 px-2 py-1 rounded">
+                            {dailyVerse.ref}
+                        </span>
+                        <button 
+                            onClick={copyVerse}
+                            className="text-qolb-dark/60 dark:text-white/60 hover:text-qolb-primary dark:hover:text-qolb-accent transition-colors text-sm flex items-center gap-1"
+                            title="Copy Verse"
+                        >
+                            {copied ? <Icons.Check /> : <Icons.Copy />}
+                            {copied ? "Copied" : "Copy"}
+                        </button>
+                        </div>
+                    </div>
+            </div>
+
         </div>
 
         {/* --- Prayer Times Grid --- */}

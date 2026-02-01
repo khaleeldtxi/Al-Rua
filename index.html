@@ -4,6 +4,11 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Al Rua - Serenity & Guidance</title>
+    
+    <!-- Babel for in-browser compilation of TSX. Pinned to 7.23.6 to ensure stability. -->
+    <script src="https://unpkg.com/@babel/standalone@7.23.6/babel.min.js"></script>
+
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
       tailwind.config = {
@@ -27,8 +32,15 @@
         }
       }
     </script>
+    
+    <!-- Polyfill for process (avoids crash on process.env.API_KEY access) -->
+    <script>
+      window.process = { env: { API_KEY: '' } };
+    </script>
+
     <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <style>
       body {
         font-family: 'Inter', sans-serif;
@@ -129,20 +141,67 @@
         from { opacity: 0; transform: scale(0.95); }
         to { opacity: 1; transform: scale(1); }
       }
+
+      /* --- New Animations for Visual Enhancement --- */
+      
+      /* Ken Burns Effect for Hero Background */
+      @keyframes kenBurns {
+        0% { transform: scale(1); }
+        100% { transform: scale(1.1); }
+      }
+      .animate-ken-burns {
+        animation: kenBurns 20s ease-in-out infinite alternate;
+      }
+
+      /* Subtle Gradient Mesh Animation for Cards */
+      @keyframes gradientShift {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+      }
+      .animate-gradient-mesh {
+        background-size: 200% 200%;
+        animation: gradientShift 8s ease infinite;
+      }
+
+      /* Floating Particles */
+      .particle {
+        position: absolute;
+        background: radial-gradient(circle, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0) 70%);
+        border-radius: 50%;
+        animation: floatUp 15s infinite ease-in;
+        opacity: 0;
+        pointer-events: none;
+      }
+      @keyframes floatUp {
+        0% { transform: translateY(0) scale(0.5); opacity: 0; }
+        20% { opacity: 0.4; }
+        80% { opacity: 0.4; }
+        100% { transform: translateY(-300px) scale(1.5); opacity: 0; }
+      }
     </style>
-  <script type="importmap">
+    
+    <script type="importmap">
 {
   "imports": {
-    "react": "https://esm.sh/react@^19.2.3",
-    "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
-    "@google/genai": "https://esm.sh/@google/genai@^1.38.0",
-    "react/": "https://esm.sh/react@^19.2.3/"
+    "react": "https://esm.sh/react@19.0.0",
+    "react-dom/client": "https://esm.sh/react-dom@19.0.0/client",
+    "@google/genai": "https://esm.sh/@google/genai@latest",
+    "react-dom/": "https://esm.sh/react-dom@^19.2.4/",
+    "react/": "https://esm.sh/react@^19.2.4/"
   }
 }
 </script>
 </head>
   <body class="bg-qolb-bg dark:bg-slate-900 transition-colors duration-500 ease-in-out">
     <div id="root"></div>
-    <script type="module" src="/index.tsx"></script>
+    <!-- 
+      Modified for Production:
+      1. type="text/babel": Tells Babel to transform this.
+      2. data-type="module": Tells Babel to treat it as an ES module (allowing imports).
+      3. data-presets: Enables React (JSX) and TypeScript support.
+      4. src="./index.tsx": Relative path prevents 404 errors on GitHub Pages subdirectories.
+    -->
+    <script type="text/babel" data-type="module" data-presets="react,typescript" src="./index.tsx"></script>
   </body>
 </html>
