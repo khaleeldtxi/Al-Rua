@@ -868,54 +868,59 @@ const App = () => {
             <FloatingParticles />
 
             {/* Content Container (Top & Middle) - Added padding-bottom to make room for footer */}
-            <div className="relative z-10 flex flex-col h-full justify-between p-8 md:p-12 pb-32">
+            <div className="relative z-10 flex flex-col h-full p-8 md:p-10 pb-36">
                 
-                {/* Top Row: Date & Current Time Label */}
-                <div className="flex justify-between items-start text-qolb-dark dark:text-white">
-                    <p className="font-bold tracking-widest uppercase text-sm md:text-base opacity-80">{getHijriDate(hijriAdjustment)}</p>
-                    <p className="font-bold tracking-widest uppercase text-sm md:text-base opacity-80">Current Time</p>
-                </div>
-
-                {/* Middle Row: Greeting & Big Clock */}
-                <div className="flex flex-col md:flex-row justify-between items-center md:items-start my-8 gap-8">
-                     {/* Left: Greeting */}
-                    <div className="text-center md:text-left">
-                         <h2 className="text-4xl md:text-6xl font-serif font-bold text-qolb-dark dark:text-white mb-2 leading-tight drop-shadow-sm">
+                {/* Header Section */}
+                <div className="flex flex-col md:flex-row justify-between items-start gap-8">
+                    
+                    {/* Left: Greetings & Date */}
+                    <div className="flex flex-col space-y-3">
+                         <h2 className="text-4xl md:text-6xl font-serif font-bold text-qolb-dark dark:text-white leading-tight drop-shadow-sm">
                             Peace be upon you
                          </h2>
-                         <h2 className="text-3xl md:text-5xl font-arabic text-qolb-dark dark:text-white mb-4 opacity-90 drop-shadow-sm">
+                         <h2 className="text-3xl md:text-5xl font-arabic text-qolb-dark dark:text-white opacity-90 drop-shadow-sm">
                             السلام عليكم
                          </h2>
-                         <p className="text-qolb-primary dark:text-qolb-light font-sans text-lg flex items-center justify-center md:justify-start gap-2 font-medium">
-                            <Icons.Location /> <span>{locationName}</span>
-                         </p>
+                         
+                         <div className="flex items-center gap-3 mt-2 text-qolb-dark/80 dark:text-white/80">
+                             <span className="font-bold tracking-widest uppercase text-sm">{getHijriDate(hijriAdjustment)}</span>
+                             <span className="w-1.5 h-1.5 rounded-full bg-qolb-primary dark:bg-qolb-accent"></span>
+                             <span className="flex items-center gap-1.5 font-medium text-sm">
+                                <Icons.Location /> {locationName}
+                             </span>
+                         </div>
                     </div>
 
-                    {/* Right: Clock & Next Prayer */}
-                    <div className="text-center md:text-right">
-                         <div className="flex flex-col items-center md:items-end">
-                            <div className="text-6xl md:text-8xl font-mono font-light text-qolb-dark dark:text-white tracking-wide mb-2 drop-shadow-sm leading-none">
-                                {currentTime.toLocaleTimeString('en-US', { timeZone: timezone, hour: '2-digit', minute:'2-digit', hour12: true }).replace(/ AM| PM/, '')}
-                                <span className="text-2xl md:text-3xl ml-2 font-sans font-bold text-qolb-primary dark:text-qolb-light">
-                                    {currentTime.toLocaleTimeString('en-US', { timeZone: timezone, hour12: true }).slice(-2)}
-                                </span>
-                            </div>
-                            
-                            {/* Timezone Display */}
-                            <div className="flex items-center gap-2 mb-4 text-sm font-medium text-qolb-dark/70 dark:text-white/70 bg-white/30 dark:bg-black/30 px-3 py-1 rounded-full backdrop-blur-md">
-                                <Icons.Globe />
-                                <span>{timezone}</span>
-                            </div>
+                    {/* Right: Time & Next Prayer */}
+                    <div className="flex flex-col items-start md:items-end">
+                         <p className="font-bold tracking-widest uppercase text-sm opacity-60 text-qolb-dark dark:text-white mb-1">Current Time</p>
+                         
+                         <div className="text-6xl md:text-8xl font-mono font-light text-qolb-dark dark:text-white tracking-tight leading-none drop-shadow-sm">
+                            {currentTime.toLocaleTimeString('en-US', { timeZone: timezone, hour: '2-digit', minute:'2-digit', hour12: true }).replace(/ AM| PM/, '')}
+                            <span className="text-2xl md:text-3xl ml-1 font-sans font-bold text-qolb-primary dark:text-qolb-accent">
+                                {currentTime.toLocaleTimeString('en-US', { timeZone: timezone, hour12: true }).slice(-2)}
+                            </span>
+                         </div>
 
-                             <div className="inline-block bg-qolb-dark/5 dark:bg-white/10 backdrop-blur-sm px-6 py-2 rounded-full border border-qolb-dark/10 dark:border-white/10">
-                                 <span className="text-qolb-primary dark:text-qolb-light text-xs font-bold uppercase tracking-widest mr-3">Upcoming: {nextPrayer || "--"}</span>
-                                 <span className="text-qolb-dark dark:text-white text-xl font-mono font-bold">
+                         <div className="flex items-center gap-2 mb-4 text-xs font-medium text-qolb-dark/60 dark:text-white/60">
+                             <Icons.Globe />
+                             <span>{timezone}</span>
+                         </div>
+
+                         <div className="flex items-center gap-3 bg-white/20 dark:bg-black/20 backdrop-blur-md px-4 py-2 rounded-2xl border border-white/20 shadow-sm">
+                             <div className="flex flex-col items-end">
+                                 <span className="text-[10px] font-bold uppercase tracking-widest text-qolb-primary dark:text-qolb-light">Next: {nextPrayer || "--"}</span>
+                                 <span className="text-xl font-mono font-bold text-qolb-dark dark:text-white leading-none">
                                     {prayerTimes && nextPrayer ? formatTime(prayerTimes[nextPrayer as keyof PrayerTimes]) : "--:--"}
                                  </span>
+                             </div>
+                             <div className="w-8 h-8 rounded-full bg-qolb-dark/10 dark:bg-white/10 flex items-center justify-center text-qolb-dark dark:text-white">
+                                 <Icons.Mosque />
                              </div>
                          </div>
                     </div>
                 </div>
+
             </div>
 
             {/* Bottom Row: Dynamic Daily Quranic Wisdom (Now as an absolute footer) */}
